@@ -21,6 +21,7 @@ public class AccountTriggerHandler {
         }
     }
     
+    //Prevent deletion of Active Account
     public static void beforeDelete(List<Account> oldAccounts) {
         for(Account acc: oldAccounts){
             if(acc.Active__c == TRUE) {
@@ -29,6 +30,7 @@ public class AccountTriggerHandler {
         }
     }
     
+    //Create Contact when Account is created.
     public static void afterInsert(List<Account> newAccounts) {
         List<Contact> listContact = new List<Contact>();
         for(Account acc: newAccounts){
@@ -48,6 +50,7 @@ public class AccountTriggerHandler {
         }
     }
     
+    //Update Contact(s) when Account is updated.
     public static void afterUpdate(List<Account> newAccounts) {
         Map <Id, Account> mapAccount = new Map <Id, Account>();
         List <Contact> listContact = new List <Contact>();
@@ -64,6 +67,7 @@ public class AccountTriggerHandler {
         }
     }
     
+    //Send Email when Account is deleted.
     public static void afterDelete(List<Account> oldAccounts) {
         List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
         for (Account acc : oldAccounts) {
@@ -78,6 +82,7 @@ public class AccountTriggerHandler {
         Messaging.sendEmail(mails);
     }
     
+    //Update Account when Account is undeleted(restored)
     public static void afterUndelete(List<Account> newAccounts) {
         List<Account> listAccount = new List<Account>();
         for(Account acc : [SELECT ID, Name, Description from Account where Id IN : newAccounts]){ 
