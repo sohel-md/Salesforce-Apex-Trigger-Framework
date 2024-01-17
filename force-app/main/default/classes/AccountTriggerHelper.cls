@@ -18,7 +18,7 @@ public with sharing class AccountTriggerHelper {
     public static void createContact(List<Account> listAcc){
         
         List<Contact> listContact = new List<Contact>();
-        for(Account acc: Trigger.new){
+        for(Account acc: listAcc){
             Contact con = new Contact();
             con.AccountId = acc.Id;
             con.LastName = acc.Name;
@@ -43,6 +43,35 @@ public with sharing class AccountTriggerHelper {
                 System.debug('Exception occurred '+ex);
             }
         }
+    }
+    
+    //Update Contact when Account is updated.
+    public static void updateContact(List<Account> listAcc){ 
+        Map < Id, Account > mapAccount = new Map < Id, Account > ();
+        List < Contact > listContact = new List < Contact > ();
+        
+        for (Account acct: listAcc)
+            mapAccount.put(acct.Id, acct);
+        
+        listContact = [SELECT MailingStreet, MailingCity, AccountId FROM Contact
+                       WHERE AccountId IN: mapAccount.keySet()
+                      ];
+        
+        if (listContact.size() > 0) {
+            for (Contact con: listContact) {
+                con.MailingStreet = mapAccount.get(con.AccountId).BillingStreet;
+                con.MailingCity = mapAccount.get(con.AccountId).BillingCity;
+            }
+            if(!listContact.isEmpty()){
+                try {
+                    Database.update(listContact, false);
+                }   
+                catch(Exception exception) {
+                    System.debug('Exception occurred. '+exception.getMessage());
+                }
+            }
+        }
+        
     }
     
 }

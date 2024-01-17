@@ -13,6 +13,7 @@ public class AccountTriggerHandler implements TriggerInterface {
     }
     
     public static void afterUpdate(Map<Id, sObject> newRecordsMap,  Map<Id, sObject> oldRecordsMap){
+        AccountTriggerHandler.updateContact ((List<Account>)newRecordsMap.values());
     }
     
     public static void beforeDelete(List<sObject> oldRecordsList , Map<Id, sObject> oldRecordsMap){
