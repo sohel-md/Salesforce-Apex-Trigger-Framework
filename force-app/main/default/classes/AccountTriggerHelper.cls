@@ -17,7 +17,7 @@ public with sharing class AccountTriggerHelper {
     //Create Contact when Account is created.
     public static void createContact(List<Account> listAcc){
 		
-		List<Contact> listContact = new List<Contact>();
+	List<Contact> listContact = new List<Contact>();
     for(Account acc: Trigger.new){
         Contact con = new Contact();
         con.AccountId = acc.Id;
