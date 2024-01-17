@@ -43,7 +43,6 @@ public with sharing class AccountTriggerHelper {
                 System.debug('Exception occurred '+ex);
             }
         }
-        
     }
     
 }
