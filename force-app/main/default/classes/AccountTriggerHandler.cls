@@ -1,25 +1,49 @@
-public class AccountTriggerHandler implements TriggerInterface {
+public with sharing class AccountTriggerHelper {
     
-    public static void beforeInsert(List<sObject> newRecordsList){
-        AccountTriggerHelper.updateAccount((List<Account>)newRecordsList);
+    //Update Account Rating based on Account Industry
+    public static void updateAccount(List<Account> newAccounts) {
+        for(Account acc: newAccounts){ 
+            if(String.isNotBlank(acc.Industry)) {
+                if(acc.Industry == 'Banking'){
+                    acc.Rating = 'Hot';
+                }
+                else {
+                    acc.Rating = 'Cold';
+                }
+            }
+        }
     }
-
-    public static void afterInsert(List<sObject> newRecordsList , Map<Id, sObject> newRecordsMap){
-        AccountTriggerHelper.createContact((List<Account>)newRecordsList);
-    }
-
-    public static void beforeUpdate(Map<Id, sObject> newRecordsMap, Map<Id, sObject> oldRecordsMap){
-    }
-
-    public static void afterUpdate(Map<Id, sObject> newRecordsMap,  Map<Id, sObject> oldRecordsMap){
-    }
-
-    public static void beforeDelete(List<sObject> oldRecordsList , Map<Id, sObject> oldRecordsMap){
-    }
+    
+    //Create Contact when Account is created.
+    public static void createContact(List<Account> listAcc){
         
-    public static void afterDelete(Map<Id, sObject> oldRecordsMap){
+        List<Contact> listContact = new List<Contact>();
+        for(Account acc: Trigger.new){
+            Contact con = new Contact();
+            con.AccountId = acc.Id;
+            con.LastName = acc.Name;
+            con.Description = 'Test Description.';
+            listContact.add(con);
+        }
+        if(!listContact.isEmpty()){
+            try{
+                Database.SaveResult[] srList = Database.insert(listContact, false);
+                for(Database.SaveResult sr : srList){
+                    if(sr.isSuccess()){
+                        System.debug('Account inserted successfully. Account Id: '+sr.getId());
+                    }
+                    else {
+                        for(Database.Error err : sr.getErrors()){
+                            System.debug('Error '+err.getMessage());
+                        }
+                    }
+                }
+            }
+            catch(Exception ex){
+                System.debug('Exception occurred '+ex);
+            }
+        }
+        
     }
     
-    public static void afterUnDelete(List<sObject> newRecordsList , Map<Id, sObject> newRecordsMap) {
-    }
 }
